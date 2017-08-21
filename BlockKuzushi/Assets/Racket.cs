@@ -26,7 +26,7 @@ public class Racket : MonoBehaviour {
 		Vector3 screenPos = Camera.main.ScreenToWorldPoint(vecMouse);
 //		Debug.Log (screenPos);
 		//オブジェクトに代入じゃ！！
-		Vector3 racketPos = new Vector3(screenPos.x*-1, 0, -6);
+		Vector3 racketPos = new Vector3(screenPos.x*-2, 0, -6);
 //		Debug.Log (racketPos);
 		transform.position = racketPos;
 	}
