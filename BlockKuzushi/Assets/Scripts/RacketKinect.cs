@@ -1,48 +1,30 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.SceneManagement;
 using Kinect = Windows.Kinect;
 
-public class BSend : MonoBehaviour
+public class RacketKinect : MonoBehaviour
 {
-    public Material BoneMaterial;
+
     public GameObject BodySourceManager;
 
     private Dictionary<ulong, GameObject> _Bodies = new Dictionary<ulong, GameObject>();
+
     private BodySourceManager _BodyManager;
 
-    private Dictionary<Kinect.JointType, Kinect.JointType> _BoneMap = new Dictionary<Kinect.JointType, Kinect.JointType>()
+    // githubてすと
+    //GameObject bE;
+    GameObject jointObj;
+
+    // Use this for initialization
+    void Start()
     {
-        { Kinect.JointType.FootLeft, Kinect.JointType.AnkleLeft },
-        { Kinect.JointType.AnkleLeft, Kinect.JointType.KneeLeft },
-        { Kinect.JointType.KneeLeft, Kinect.JointType.HipLeft },
-        { Kinect.JointType.HipLeft, Kinect.JointType.SpineBase },
+        //      this.bE = GameObject.Find("bulletE");
+        //this.spnMid = GameObject.Find("spnMid");
+    }
 
-        { Kinect.JointType.FootRight, Kinect.JointType.AnkleRight },
-        { Kinect.JointType.AnkleRight, Kinect.JointType.KneeRight },
-        { Kinect.JointType.KneeRight, Kinect.JointType.HipRight },
-        { Kinect.JointType.HipRight, Kinect.JointType.SpineBase },
-
-        { Kinect.JointType.HandTipLeft, Kinect.JointType.HandLeft },
-        { Kinect.JointType.ThumbLeft, Kinect.JointType.HandLeft },
-        { Kinect.JointType.HandLeft, Kinect.JointType.WristLeft },
-        { Kinect.JointType.WristLeft, Kinect.JointType.ElbowLeft },
-        { Kinect.JointType.ElbowLeft, Kinect.JointType.ShoulderLeft },
-        { Kinect.JointType.ShoulderLeft, Kinect.JointType.SpineShoulder },
-
-        { Kinect.JointType.HandTipRight, Kinect.JointType.HandRight },
-        { Kinect.JointType.ThumbRight, Kinect.JointType.HandRight },
-        { Kinect.JointType.HandRight, Kinect.JointType.WristRight },
-        { Kinect.JointType.WristRight, Kinect.JointType.ElbowRight },
-        { Kinect.JointType.ElbowRight, Kinect.JointType.ShoulderRight },
-        { Kinect.JointType.ShoulderRight, Kinect.JointType.SpineShoulder },
-
-        { Kinect.JointType.SpineBase, Kinect.JointType.SpineMid },
-        { Kinect.JointType.SpineMid, Kinect.JointType.SpineShoulder },
-        { Kinect.JointType.SpineShoulder, Kinect.JointType.Neck },
-        { Kinect.JointType.Neck, Kinect.JointType.Head },
-    };
-
+    // Update is called once per frame
     void Update()
     {
         if (BodySourceManager == null)
@@ -55,13 +37,11 @@ public class BSend : MonoBehaviour
         {
             return;
         }
-
         Kinect.Body[] data = _BodyManager.GetData();
         if (data == null)
         {
             return;
         }
-
         List<ulong> trackedIds = new List<ulong>();
         foreach (var body in data)
         {
@@ -87,7 +67,7 @@ public class BSend : MonoBehaviour
                 _Bodies.Remove(trackingId);
             }
         }
-        
+
         foreach (var body in data)
         {
             if (body == null)
@@ -105,20 +85,35 @@ public class BSend : MonoBehaviour
                 RefreshBodyObject(body, _Bodies[body.TrackingId]);
             }
         }
+
+
+
+        //マウスのx,y座標を取得
+        Vector3 vecSpineMid = jointObj.transform.position;
+        //ワールド座標に変換じゃ！！
+        //Vector3 screenPos = Camera.main.ScreenToWorldPoint(vecMouse);
+        //オブジェクトに代入じゃ！！
+        Vector3 racketPos = new Vector3(vecSpineMid.x, 0, -6);
+        transform.position = racketPos;
+
+
+        //      JugdeE (bE);
+
+
     }
 
     private GameObject CreateBodyObject(ulong id)
     {
         GameObject body = new GameObject("Body:" + id);
 
-        for (Kinect.JointType jt = Kinect.JointType.SpineBase; jt <= Kinect.JointType.ThumbRight; jt++)
+        for (Kinect.JointType jt = Kinect.JointType.SpineMid; jt <= Kinect.JointType.SpineMid; jt++)
         {
-            GameObject jointObj = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            jointObj = GameObject.CreatePrimitive(PrimitiveType.Cube);
 
-            LineRenderer lr = jointObj.AddComponent<LineRenderer>();
-            lr.SetVertexCount(2);
-            lr.material = BoneMaterial;
-            lr.SetWidth(0.05f, 0.05f);
+            //LineRenderer lr = jointObj.AddComponent<LineRenderer>();
+            //lr.SetVertexCount(2);
+            //lr.material = BoneMaterial;
+            //lr.SetWidth(0.05f, 0.05f);
 
             jointObj.transform.localScale = new Vector3(0.3f, 0.3f, 0.3f);
             jointObj.name = jt.ToString();
@@ -127,24 +122,23 @@ public class BSend : MonoBehaviour
 
         return body;
     }
-
     private void RefreshBodyObject(Kinect.Body body, GameObject bodyObject)
     {
         Vector3 center = GetVector3FromJoint(body.Joints[Kinect.JointType.SpineBase]);
 
-        for (Kinect.JointType jt = Kinect.JointType.SpineBase; jt <= Kinect.JointType.ThumbRight; jt++)
+        for (Kinect.JointType jt = Kinect.JointType.SpineMid; jt <= Kinect.JointType.SpineMid; jt++)
         {
             Kinect.Joint sourceJoint = body.Joints[jt];
-            Kinect.Joint? targetJoint = null;
+            //    Kinect.Joint? targetJoint = null;
 
-            if (_BoneMap.ContainsKey(jt))
-            {
-                targetJoint = body.Joints[_BoneMap[jt]];
-            }
+            //            if (_BoneMap.ContainsKey(jt))
+            //          {
+            //            targetJoint = body.Joints[_BoneMap[jt]];
+            //      }
 
             Transform jointObj = bodyObject.transform.Find(jt.ToString());
             jointObj.localPosition = GetVector3FromJoint(sourceJoint);
-
+            /*
             LineRenderer lr = jointObj.GetComponent<LineRenderer>();
             if (targetJoint.HasValue)
             {
@@ -156,21 +150,7 @@ public class BSend : MonoBehaviour
             {
                 lr.enabled = false;
             }
-        }
-    }
-
-    private static Color GetColorForState(Kinect.TrackingState state)
-    {
-        switch (state)
-        {
-            case Kinect.TrackingState.Tracked:
-                return Color.green;
-
-            case Kinect.TrackingState.Inferred:
-                return Color.red;
-
-            default:
-                return Color.black;
+            */
         }
     }
 

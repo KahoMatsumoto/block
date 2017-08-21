@@ -130,8 +130,6 @@ public class BodySourceView : MonoBehaviour
     
     private void RefreshBodyObject(Kinect.Body body, GameObject bodyObject)
     {
-        Vector3 center = GetVector3FromJoint(body.Joints[Kinect.JointType.SpineBase]);
-
         for (Kinect.JointType jt = Kinect.JointType.SpineBase; jt <= Kinect.JointType.ThumbRight; jt++)
         {
             Kinect.Joint sourceJoint = body.Joints[jt];
@@ -142,7 +140,7 @@ public class BodySourceView : MonoBehaviour
                 targetJoint = body.Joints[_BoneMap[jt]];
             }
             
-            Transform jointObj = bodyObject.transform.Find(jt.ToString());
+            Transform jointObj = bodyObject.transform.FindChild(jt.ToString());
             jointObj.localPosition = GetVector3FromJoint(sourceJoint);
             
             LineRenderer lr = jointObj.GetComponent<LineRenderer>();
